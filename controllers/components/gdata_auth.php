@@ -277,9 +277,9 @@ class GdataAuthComponent extends Object {
 
     App::import('Vendor', 'HttpSocketOauth');
     $HttpSocketOauth = new HttpSocketOauth();
-pr($request);
+//pr($request);
     $response = $HttpSocketOauth->request($request);
-pr($response);
+//pr($response);
     if ($HttpSocketOauth->response['status']['code'] != 200) {
       $this->Session->write('Gdata.Auth.' . $this->_dataSourceName . '.error', __('Could not get access token. Response for get access token was not OK.', true));
       $this->controller->redirect($this->Session->read('Gdata.Auth.' . $this->_dataSourceName . '.return_to'));
@@ -295,7 +295,7 @@ pr($response);
     // true and just before that, copy the oauth access token and secret to the
     // datasource config.
     $this->_setLoggedIn();
-pr($this->Session->read());
+//pr($this->Session->read());
     $this->controller->redirect($this->Session->read('Gdata.Auth.' . $this->_dataSourceName . '.return_to'));
 
   }
