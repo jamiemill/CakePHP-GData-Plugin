@@ -264,8 +264,14 @@ class GdataAuthComponent extends Object {
    *
    * @param string $dataSourceName The name of the datasource for which you want
    *  to get an OAuth token.
+   * @param boolean $autoRedirect Whether to redirect back automatically. Set
+   *  to false if you want to handle the redirect manually after some more post-
+   *  processing (e.g. saving the token and secret in the database permanently).
+   * @return array containing 'redirect', 'oauth_token'& 'oauth_token_secret' in
+   *  case you want to store the token and secret in the database and hande the
+   *  redirect separately.
    */
-  public function getOAuthAccessToken($dataSourceName) {
+  public function getOAuthAccessToken($dataSourceName, $autoRedirect = true) {
 
     $this->_dataSourceName = $dataSourceName;
 
@@ -288,9 +294,9 @@ class GdataAuthComponent extends Object {
 
     App::import('Vendor', 'HttpSocketOauth');
     $HttpSocketOauth = new HttpSocketOauth();
-//pr($request);
+
     $response = $HttpSocketOauth->request($request);
-//pr($response);
+
     if ($HttpSocketOauth->response['status']['code'] != 200) {
       $this->Session->write('Gdata.Auth.' . $this->_dataSourceName . '.error', __('Could not get access token. Response for get access token was not OK.', true));
       $this->controller->redirect($this->Session->read('Gdata.Auth.' . $this->_dataSourceName . '.return_to'));
@@ -306,9 +312,15 @@ class GdataAuthComponent extends Object {
     // true and just before that, copy the oauth access token and secret to the
     // datasource config.
     $this->_setLoggedIn();
-//pr($this->Session->read());
-    $this->controller->redirect($this->Session->read('Gdata.Auth.' . $this->_dataSourceName . '.return_to'));
 
+    if($autoRedirect) {
+        $this->controller->redirect($this->Session->read('Gdata.Auth.' . $this->_dataSourceName . '.return_to'));
+    }
+	return array(
+		'redirect' => $this->Session->read('Gdata.Auth.' . $this->_dataSourceName . '.return_to'),
+		'oauth_token' => $response['oauth_token'],
+		'oauth_token_secret' => $response['oauth_token_secret']
+	);
   }
 
 }
