@@ -41,6 +41,11 @@ class GoogleContact extends GdataAppModel {
 		if ($state == 'before') {
 			$this->request['auth'] = true;
 			$this->request['uri']['path'] = 'm8/feeds/contacts/default/full';
+			if(!empty($query['conditions']['title'])) {
+				$this->request['uri']['query']['title'] = $query['conditions']['title'];
+			} elseif (!empty($query['conditions']['q'])) {
+				$this->request['uri']['query']['q'] = $query['conditions']['q'];
+			}
 			$results = $this->_paginationParams($query);
 		}
 		
