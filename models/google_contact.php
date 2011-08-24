@@ -51,35 +51,6 @@ class GoogleContact extends GdataAppModel {
 		
 		return $results;
 	}
-	
-	public function getList() {
-		$results = $this->find('contacts');
-		//debug($results);
-		
-		$list = array();
-		if (!empty($results['feed']['entry'])) {
-			foreach ($results['feed']['entry'] AS $i => $entry) {
-				// email
-				if (isset($entry['email']['0']) && is_array($entry['email']['0'])) {
-					$email = $entry['email']['0']['address'];
-				} else {
-					$email = $entry['email']['address'];
-				}
-				
-				// title
-				if (empty($entry['title'])) {
-					$title = '';
-				} elseif (!empty($entry['title']) && is_array($entry['title'])) {
-					$title = $entry['title']['0'];
-				} else {
-					$title = $entry['title'];
-				}
-				
-				$list[$email] = $title;
-			}
-		}
-		return $list;
-	}
 
 }
 
