@@ -3,6 +3,9 @@
 /**
  * DataSource for the Gdata Google Contacts Data API
  *
+ * @author Fahad Ibnay Heylaal <contact@fahad19.com>
+ * @link http://fahad19.com
+ * @copyright (c) 2011 Fahad Ibnay Heylaal
  * @license MIT License - http://www.opensource.org/licenses/mit-license.php
  */
 class GoogleContacts extends GdataSource {
