@@ -66,7 +66,7 @@ class GoogleContact extends GdataAppModel {
 		return $results;
 	}
 
-	public function saveContact($data) {
+	public function save($data = null, $validate = true, $fieldList = array()) {
 		$contact = new DOMDocument('1.0', 'utf-8');
 		$entry = $contact->createElementNS('http://www.w3.org/2005/Atom', 'atom:entry');
 
@@ -114,6 +114,7 @@ class GoogleContact extends GdataAppModel {
 			'uri' => array(
 				'path' => 'm8/feeds/contacts/default/full/' . $contactId,
 			),
+			'method' => 'PUT',
 			'header' => array(
 				'Content-Type' => 'application/atom+xml',
 				'Slug' => $data['entry']['title'],
@@ -124,10 +125,8 @@ class GoogleContact extends GdataAppModel {
 			'body' => $body,
 		);
 
-		//debug($this->request());
-		$result = $this->request();
-		debug($result);
-
+		$result = parent::save($data, $validate, $fieldList);
+		
 		if($result){
 			// In Google's documentation it looks like there should be a gd:resourceId node, but it appears
 			// as simply resourceId to us. Keep an eye on this.
