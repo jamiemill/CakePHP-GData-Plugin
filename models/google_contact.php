@@ -93,6 +93,8 @@ class GoogleContact extends GdataAppModel {
 				// rel
 				if (isset($email['rel'])) {
 					$element->setAttribute('rel', $email['rel']);
+				} else {
+					$element->setAttribute('rel', 'http://schemas.google.com/g/2005#other');
 				}
 
 				// primary
@@ -122,7 +124,9 @@ class GoogleContact extends GdataAppModel {
 			'body' => $body,
 		);
 
-		$result = parent::save($data);
+		//debug($this->request());
+		$result = $this->request();
+		debug($result);
 
 		if($result){
 			// In Google's documentation it looks like there should be a gd:resourceId node, but it appears
