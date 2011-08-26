@@ -35,7 +35,21 @@ class GoogleContact extends GdataAppModel {
 	 */
 	public $_findMethods = array(
 		'contacts' => true,
+		'contact' => true,
 	);
+
+	protected function _findContact($state, $query = array(), $results = array()) {
+		if ($state == 'before' && isset($query['conditions']['contactId'])) {
+			$this->request['auth'] = true;
+			$this->request['uri']['path'] = 'm8/feeds/contacts/default/full/' . $query['conditions']['contactId'];
+			//$results = $this->_paginationParams($query);
+			$results['page'] = 1;
+			$results['order'] = '';
+			$results['callbacks'] = array();
+		}
+
+		return $results;
+	}
 
 	protected function _findContacts($state, $query = array(), $results = array()) {
 		if ($state == 'before') {
@@ -52,6 +66,7 @@ class GoogleContact extends GdataAppModel {
 		return $results;
 	}
 
+	
 }
 
 ?>
