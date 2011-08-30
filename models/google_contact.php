@@ -27,6 +27,17 @@ class GoogleContact extends GdataAppModel {
 	 * @var name
 	 */
 	public $useDbConfig = 'googleContacts';
+	
+	/**
+	 * The fields and their types for the form helper and ensuring Model::save 
+	 * acknowledges the data.
+	 *
+	 * @var array
+	 */
+	public $_schema = array(
+		'id' => array('type' => 'string', 'length' => '255'),
+		'entry' => array('type' => 'text'),
+	);
 
 	/**
 	 * The custom find types
@@ -69,6 +80,7 @@ class GoogleContact extends GdataAppModel {
 	public function save($data = null, $validate = true, $fieldList = array()) {
 		$contact = new DOMDocument('1.0', 'utf-8');
 		$entry = $contact->createElementNS('http://www.w3.org/2005/Atom', 'atom:entry');
+		//$entry->setAttribute('gd:etag', 'Etag');
 
 		$id = $contact->createElement('id', $data['entry']['id']);
 		$entry->appendChild($id);
@@ -85,7 +97,7 @@ class GoogleContact extends GdataAppModel {
 			}
 
 			foreach ($emails AS $email) {
-				$element = $contact->createElement('gd:email');
+				$element = $contact->createElementNS('http://schemas.google.com/g/2005', 'gd:email'); //$contact->createElement('gd:email');
 
 				// address
 				$element->setAttribute('address', $email['address']);
@@ -112,12 +124,14 @@ class GoogleContact extends GdataAppModel {
 		$contactId = $entryIdE['1'];
 		$this->request = array(
 			'uri' => array(
+				'host' => 'www.google.com',
 				'path' => 'm8/feeds/contacts/default/full/' . $contactId,
 			),
 			'method' => 'PUT',
 			'header' => array(
 				'Content-Type' => 'application/atom+xml',
 				'Slug' => $data['entry']['title'],
+				'If-Match' => $data['entry']['gd:etag'],
 			),
 			'auth' => array(
 				'method' => 'OAuth',
@@ -127,7 +141,7 @@ class GoogleContact extends GdataAppModel {
 
 		$result = parent::save($data, $validate, $fieldList);
 		
-		if($result){
+		/*if ($result){
 			// In Google's documentation it looks like there should be a gd:resourceId node, but it appears
 			// as simply resourceId to us. Keep an eye on this.
 			if(empty($this->response['entry']['id'])) {
@@ -135,9 +149,26 @@ class GoogleContact extends GdataAppModel {
 				return false;
 			}
 			$this->setInsertID($this->response['entry']['id']);
-		}
+		}*/
 
 		return $result;
+	}
+	
+	/**
+	 * Overrides cake's Model::exists() to prevent a find('count') being triggered and
+	 * instead just checks whether $this->id or $this->data[alias][id] is set.
+	 * 
+	 * This is to help cake correctly choose between create() and update() methods on the datasource
+	 * when saving.
+	 * 
+	 * TODO: perhaps implement a proper call to google to check if a record with
+	 * the found ID actually exists, to match Model::exists() more closely?
+	 * 
+	 * @return boolean
+	 */
+	
+	function exists() {
+		return !empty($this->id) || !empty($this->data[$this->alias][$this->primaryKey]);
 	}
 
 }
