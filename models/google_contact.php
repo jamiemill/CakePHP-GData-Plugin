@@ -80,7 +80,7 @@ class GoogleContact extends GdataAppModel {
 	public function save($data = null, $validate = true, $fieldList = array()) {
 		$contact = new DOMDocument('1.0', 'utf-8');
 		$entry = $contact->createElementNS('http://www.w3.org/2005/Atom', 'atom:entry');
-		//$entry->setAttribute('gd:etag', 'Etag');
+		$entry->setAttribute('gd:etag', $data['entry']['gd:etag']);
 
 		$id = $contact->createElement('id', $data['entry']['id']);
 		$entry->appendChild($id);
@@ -95,7 +95,18 @@ class GoogleContact extends GdataAppModel {
 			if (!isset($emails['0'])) {
 				$emails = array($emails);
 			}
+			
+			// title
+			$title = $contact->createElement('atom:title', $data['entry']['title']);
+			$entry->appendChild($title);
+			
+			// name
+			$name = $contact->createElement('gd:name');
+			$fullName = $contact->createElement('gd:fullName', $data['entry']['title']);
+			$name->appendChild($fullName);
+			$entry->appendChild($name);
 
+			// emails
 			foreach ($emails AS $email) {
 				$element = $contact->createElementNS('http://schemas.google.com/g/2005', 'gd:email'); //$contact->createElement('gd:email');
 
