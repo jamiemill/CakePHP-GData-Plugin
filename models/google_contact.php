@@ -115,8 +115,7 @@ class GoogleContact extends GdataAppModel {
 					$organization->appendChild($orgName);
 				}
 				if (isset($data['entry']['organization']['orgTitle'])) {
-					//$orgTitle = $contact->createElement('gd:orgTitle', $data['entry']['organization']['orgTitle']);
-					$orgTitle = $contact->createElement('gd:orgTitle', 'Janitor');
+					$orgTitle = $contact->createElement('gd:orgTitle', $data['entry']['organization']['orgTitle']);
 					$organization->appendChild($orgTitle);
 				}
 				$entry->appendChild($organization);
