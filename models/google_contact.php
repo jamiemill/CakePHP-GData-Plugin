@@ -106,6 +106,22 @@ class GoogleContact extends GdataAppModel {
 			$name->appendChild($fullName);
 			$entry->appendChild($name);
 
+			// organization
+			if (!empty($data['entry']['organization'])) {
+				$organization = $contact->createElement('gd:organization');
+				$organization->setAttribute('rel', 'http://schemas.google.com/g/2005#other');
+				if (isset($data['entry']['organization']['orgName'])) {
+					$orgName = $contact->createElement('gd:orgName', $data['entry']['organization']['orgName']);
+					$organization->appendChild($orgName);
+				}
+				if (isset($data['entry']['organization']['orgTitle'])) {
+					//$orgTitle = $contact->createElement('gd:orgTitle', $data['entry']['organization']['orgTitle']);
+					$orgTitle = $contact->createElement('gd:orgTitle', 'Janitor');
+					$organization->appendChild($orgTitle);
+				}
+				$entry->appendChild($organization);
+			}
+
 			// emails
 			foreach ($emails AS $email) {
 				$element = $contact->createElementNS('http://schemas.google.com/g/2005', 'gd:email'); //$contact->createElement('gd:email');
