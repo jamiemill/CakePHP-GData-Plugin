@@ -141,6 +141,23 @@ class GoogleContact extends GdataAppModel {
 				}
 				$entry->appendChild($element);
 			}
+
+			// phoneNumbers
+			if (!empty($data['entry']['phoneNumber'])) {
+				$phoneNumbers = $data['entry']['phoneNumber'];
+				foreach ($phoneNumbers AS $phoneNumber) {
+					$element = $contact->createElement('gd:phoneNumber', $phoneNumber['value']);
+
+					// rel
+					if (isset($phoneNumber['rel'])) {
+						$element->setAttribute('rel', $phoneNumber['rel']);
+					} else {
+						$element->setAttribute('rel', 'http://schemas.google.com/g/2005#other');
+					}
+
+					$entry->appendChild($element);
+				}
+			}
 		}
 
 		$contact->appendChild($entry);
