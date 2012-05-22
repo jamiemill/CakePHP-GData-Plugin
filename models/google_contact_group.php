@@ -75,7 +75,77 @@ class GoogleContactGroup extends GdataAppModel {
 	}
 
 	public function save($data = null, $validate = true, $fieldList = array()) {
-		$result = true;
+		$contactGroup = new DOMDocument('1.0', 'utf-8');
+		$entry = $contactGroup->createElementNS('http://www.w3.org/2005/Atom', 'atom:entry');
+		if (isset($data['entry']['gd:etag'])) {
+			$entry->setAttribute('gd:etag', $data['entry']['gd:etag']);
+		}
+
+		if (isset($data['entry']['id'])) {
+			$idEl = $contactGroup->createElement('id', $data['entry']['id']);
+			$entry->append($idEl);
+		}
+
+		$category = $contactGroup->createElement('atom:category');
+		$category->setAttribute('scheme' ,'http://schemas.google.com/g/2005#kind');
+		$category->setAttribute('term' ,'http://schemas.google.com/contact/2008#group');
+		$entry->appendChild($category);
+
+		$title = $contactGroup->createElement('atom:title', $data['entry']['title']);
+		$title->setAttribute('type', 'text');
+		$entry->appendChild($title);
+
+		if (isset($data['entry']['content'])) {
+			$content = $contactGroup->createElement('content', $data['entry']['content']);
+			$content->setAttribute('type', 'text');
+			$entry->appendChild($content);
+		}
+
+		$path = null;
+		$method = null;
+		$header = array(
+			'Content-Type' => 'application/atom+xml',
+			'Slug' => $data['entry']['title'],
+		);
+		if (isset($data['entry']['link'])) {
+			foreach($data['entry']['link'] AS $link) {
+				if (isset($link['rel']) && $link['rel'] == 'edit') {
+					$path = $link['href'];
+					$method = 'PUT';
+					$header['If-Match'] = $data['gd:etag'];
+				}
+
+				$linkEl = $contactGroup->createElement('link');
+				$linkEl->setAttribute('rel', $link['rel']);
+				$linkEl->setAttribute('type', $link['type']);
+				$linkEl->setAttribute('href', $link['href']);
+				$entry->appendChild($linkEl);
+			}
+		}
+
+		$contactGroup->appendChild($entry);
+		$body = $contactGroup->saveXML();
+
+		if (!$path) {
+			$path = 'm8/feeds/groups/' . $data['email'] . '/full';
+			$method = 'POST';
+		}
+
+		$this->request = array(
+			'uri' => array(
+				'host' => 'www.google.com',
+				'path' => $path,
+			),
+			'method' => $method,
+			'header' => $header,
+			'auth' => array(
+				'method' => 'OAuth',
+			),
+			'body' => $body,
+		);
+
+		$result = parent::save($data, $validate, $fieldList);
+
 		return $result;
 	}
 	
