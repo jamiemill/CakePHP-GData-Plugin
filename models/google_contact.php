@@ -81,6 +81,7 @@ class GoogleContact extends GdataAppModel {
 		$contact = new DOMDocument('1.0', 'utf-8');
 		$entry = $contact->createElementNS('http://www.w3.org/2005/Atom', 'atom:entry');
 		$entry->setAttribute('gd:etag', $data['entry']['gd:etag']);
+		$entry->setAttribute('xmlns:gContact', 'http://schemas.google.com/contact/2008');
 
 		$id = $contact->createElement('id', $data['entry']['id']);
 		$entry->appendChild($id);
