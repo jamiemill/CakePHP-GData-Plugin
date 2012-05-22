@@ -158,6 +158,24 @@ class GoogleContact extends GdataAppModel {
 					$entry->appendChild($element);
 				}
 			}
+
+			// groups
+			if (!empty($data['entry']['groupMembershipInfo'])) {
+				$groupMembershipInfo = $data['entry']['groupMembershipInfo'];
+				foreach ($groupMembershipInfo AS $group) {
+					$element = $contact->createElement('gContact:groupMembershipInfo');
+
+					// deleted
+					$element->setAttribute('deleted', 'false');
+
+					// href
+					if (isset($group['href'])) {
+						$element->setAttribute('href', $group['href']);	
+					}
+
+					$entry->appendChild($element);
+				}
+			}
 		}
 
 		$contact->appendChild($entry);
