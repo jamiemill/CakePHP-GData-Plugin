@@ -160,6 +160,28 @@ class GoogleContact extends GdataAppModel {
 				}
 			}
 
+			// IMs
+			if (!empty($data['entry']['im'])) {
+				$ims = $data['entry']['im'];
+				foreach ($ims AS $im) {
+					$element = $contact->createElement('gd:im');
+
+					if (isset($im['rel'])) {
+						$element->setAttribute('rel', $im['rel']);
+					}
+
+					if (isset($im['address'])) {
+						$element->setAttribute('address', $im['address']);
+					}
+
+					if (isset($im['protocol'])) {
+						$element->setAttribute('protocol', $im['protocol']);
+					}
+
+					$entry->appendChild($element);
+				}
+			}
+
 			// groups
 			if (!empty($data['entry']['groupMembershipInfo'])) {
 				$groupMembershipInfo = $data['entry']['groupMembershipInfo'];
