@@ -81,6 +81,7 @@ class GoogleContact extends GdataAppModel {
 		$contact = new DOMDocument('1.0', 'utf-8');
 		$entry = $contact->createElementNS('http://www.w3.org/2005/Atom', 'atom:entry');
 		$entry->setAttribute('gd:etag', $data['entry']['gd:etag']);
+		$entry->setAttribute('xmlns:gContact', 'http://schemas.google.com/contact/2008');
 
 		$id = $contact->createElement('id', $data['entry']['id']);
 		$entry->appendChild($id);
@@ -153,6 +154,46 @@ class GoogleContact extends GdataAppModel {
 						$element->setAttribute('rel', $phoneNumber['rel']);
 					} else {
 						$element->setAttribute('rel', 'http://schemas.google.com/g/2005#other');
+					}
+
+					$entry->appendChild($element);
+				}
+			}
+
+			// IMs
+			if (!empty($data['entry']['im'])) {
+				$ims = $data['entry']['im'];
+				foreach ($ims AS $im) {
+					$element = $contact->createElement('gd:im');
+
+					if (isset($im['rel'])) {
+						$element->setAttribute('rel', $im['rel']);
+					}
+
+					if (isset($im['address'])) {
+						$element->setAttribute('address', $im['address']);
+					}
+
+					if (isset($im['protocol'])) {
+						$element->setAttribute('protocol', $im['protocol']);
+					}
+
+					$entry->appendChild($element);
+				}
+			}
+
+			// groups
+			if (!empty($data['entry']['groupMembershipInfo'])) {
+				$groupMembershipInfo = $data['entry']['groupMembershipInfo'];
+				foreach ($groupMembershipInfo AS $group) {
+					$element = $contact->createElement('gContact:groupMembershipInfo');
+
+					// deleted
+					$element->setAttribute('deleted', 'false');
+
+					// href
+					if (isset($group['href'])) {
+						$element->setAttribute('href', $group['href']);	
 					}
 
 					$entry->appendChild($element);
